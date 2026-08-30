@@ -1,0 +1,3261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>OCEANEYE - Ocean Observation Platform</title>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<style>
+
+/* =====================================================
+   GLOBAL
+===================================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+
+    margin: 0;
+
+    font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+    background: #06131f;
+
+    color: white;
+}
+
+.container {
+
+    width: 95%;
+
+    max-width: 1450px;
+
+    margin: auto;
+
+    padding: 25px 0 40px;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+header {
+
+    display: flex;
+
+    justify-content:
+    space-between;
+
+    align-items: center;
+
+    background: #0b2233;
+
+    border: 1px solid #1d4258;
+
+    border-radius: 16px;
+
+    padding: 22px;
+
+    margin-bottom: 25px;
+}
+
+.title h1 {
+
+    margin: 0;
+
+    font-size: 36px;
+}
+
+.title p {
+
+    color: #91aaba;
+
+    margin: 8px 0;
+}
+
+.location {
+
+    color: #65c8ff;
+
+    font-size: 14px;
+}
+
+.network-online {
+
+    background: #103b2b;
+
+    color: #50ed93;
+
+    padding: 12px 20px;
+
+    border-radius: 25px;
+
+    font-weight: bold;
+}
+
+.green-dot {
+
+    display: inline-block;
+
+    width: 10px;
+
+    height: 10px;
+
+    border-radius: 50%;
+
+    background: #50ed93;
+
+    margin-right: 7px;
+}
+
+
+/* =====================================================
+   SECTION
+===================================================== */
+
+.section-title {
+
+    font-size: 23px;
+
+    margin: 30px 0 15px;
+}
+
+
+/* =====================================================
+   SENSOR CARDS
+===================================================== */
+
+.cards {
+
+    display: grid;
+
+    grid-template-columns:
+    repeat(4, 1fr);
+
+    gap: 15px;
+}
+
+.card {
+
+    background: #0b2233;
+
+    border: 1px solid #1d4258;
+
+    border-radius: 14px;
+
+    padding: 20px;
+
+    min-height: 170px;
+}
+
+.card h3 {
+
+    margin: 0;
+
+    color: #b8ccd9;
+
+    font-size: 16px;
+}
+
+.value {
+
+    font-size: 28px;
+
+    font-weight: bold;
+
+    margin: 18px 0 8px;
+}
+
+.range {
+
+    color: #718b9d;
+
+    font-size: 13px;
+}
+
+.status {
+
+    display: inline-block;
+
+    margin-top: 12px;
+
+    padding: 5px 9px;
+
+    border-radius: 5px;
+
+    font-size: 11px;
+
+    font-weight: bold;
+}
+
+.normal {
+
+    color: #52eb94;
+
+    background: #123b2b;
+}
+
+
+/* =====================================================
+   PANEL
+===================================================== */
+
+.panel {
+
+    background: #0b2233;
+
+    border: 1px solid #1d4258;
+
+    border-radius: 15px;
+
+    padding: 22px;
+}
+
+
+/* =====================================================
+   GYROSCOPE
+===================================================== */
+
+.gyro {
+
+    display: grid;
+
+    grid-template-columns:
+    repeat(3, 1fr);
+
+    gap: 15px;
+}
+
+.axis {
+
+    background: #102d40;
+
+    padding: 20px;
+
+    border-radius: 10px;
+
+    text-align: center;
+}
+
+.axis strong {
+
+    display: block;
+
+    margin-top: 10px;
+
+    font-size: 25px;
+}
+
+
+/* =====================================================
+   POWER
+===================================================== */
+
+.power {
+
+    display: grid;
+
+    grid-template-columns:
+    repeat(5, 1fr);
+
+    gap: 12px;
+}
+
+.power-item {
+
+    background: #102d40;
+
+    border-radius: 10px;
+
+    padding: 18px;
+}
+
+.power-item span {
+
+    color: #8da5b5;
+}
+
+.power-item strong {
+
+    display: block;
+
+    margin-top: 9px;
+
+    font-size: 23px;
+}
+
+
+/* =====================================================
+   GPS
+===================================================== */
+
+.gps {
+
+    display: grid;
+
+    grid-template-columns:
+    repeat(4, 1fr);
+
+    gap: 15px;
+}
+
+.gps-item {
+
+    background: #102d40;
+
+    padding: 18px;
+
+    border-radius: 10px;
+}
+
+.gps-item span {
+
+    color: #8da5b5;
+
+    display: block;
+}
+
+.gps-item strong {
+
+    display: block;
+
+    margin-top: 8px;
+}
+
+
+/* =====================================================
+   MAP
+===================================================== */
+
+#map {
+
+    width: 100%;
+
+    height: 430px;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+}
+
+
+/* =====================================================
+   COMMUNICATION MAIN
+===================================================== */
+
+.communication-panel {
+
+    background: #080f15;
+
+    border: 1px solid #263746;
+
+    border-radius: 15px;
+
+    padding: 20px;
+
+    overflow: hidden;
+}
+
+
+/* =====================================================
+   NETWORK VISUALIZATION
+===================================================== */
+
+.network-map {
+
+    position: relative;
+
+    width: 100%;
+
+    height: 470px;
+
+    background:
+    radial-gradient(
+        circle at center,
+        rgba(30,80,100,.16),
+        transparent 60%
+    );
+
+    overflow: hidden;
+
+    border-radius: 12px;
+}
+
+
+/* GRID */
+
+.network-map::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background-image:
+
+    linear-gradient(
+        rgba(255,255,255,.025) 1px,
+        transparent 1px
+    ),
+
+    linear-gradient(
+        90deg,
+        rgba(255,255,255,.025) 1px,
+        transparent 1px
+    );
+
+    background-size: 40px 40px;
+}
+
+
+/* RANGE CIRCLES */
+
+.range-circle {
+
+    position: absolute;
+
+    border: 1px solid
+    rgba(80,150,180,.16);
+
+    border-radius: 50%;
+
+    transform:
+    translate(-50%,-50%);
+}
+
+
+/* CONNECTION SVG */
+
+#networkSvg {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    z-index: 2;
+}
+
+
+/* NODES */
+
+.node {
+
+    position: absolute;
+
+    width: 15px;
+
+    height: 15px;
+
+    border-radius: 50%;
+
+    background: #7f8790;
+
+    border: 2px solid #c8ced3;
+
+    z-index: 4;
+
+    transform:
+    translate(-50%,-50%);
+
+    box-shadow:
+    0 0 10px rgba(150,170,180,.35);
+
+    transition: .4s;
+}
+
+
+/* ACTIVE NODE */
+
+.node.active {
+
+    background: #4c8cff;
+
+    border-color: #8eb9ff;
+
+    box-shadow:
+    0 0 15px
+    rgba(60,130,255,.7);
+}
+
+
+/* BASE STATION */
+
+.base-station {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 50%;
+
+    transform:
+    translate(-50%,-50%);
+
+    width: 65px;
+
+    height: 65px;
+
+    border-radius: 50%;
+
+    background: #e9f3ff;
+
+    border: 4px solid #9db9d5;
+
+    z-index: 6;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #111;
+
+    font-size: 25px;
+
+    box-shadow:
+    0 0 20px
+    rgba(180,220,255,.45);
+}
+
+.base-label {
+
+    position: absolute;
+
+    top: calc(50% + 39px);
+
+    left: 50%;
+
+    transform:
+    translateX(-50%);
+
+    z-index: 7;
+
+    font-weight: bold;
+
+    white-space: nowrap;
+}
+
+
+/* GREEN COVERAGE AREA */
+
+.coverage {
+
+    position: absolute;
+
+    background:
+    rgba(80,170,90,.13);
+
+    border: 2px solid
+    rgba(110,220,120,.65);
+
+    transform:
+    rotate(20deg);
+
+    z-index: 1;
+}
+
+
+/* =====================================================
+   NETWORK SUMMARY
+===================================================== */
+
+.network-summary {
+
+    display: grid;
+
+    grid-template-columns:
+    repeat(2, 1fr);
+
+    gap: 0;
+
+    margin-top: 20px;
+
+    text-align: center;
+}
+
+.summary-item {
+
+    padding: 12px;
+
+    border-right:
+    1px solid #58616a;
+}
+
+.summary-item:last-child {
+
+    border-right: none;
+}
+
+.summary-title {
+
+    color: #b7c5cf;
+
+    font-size: 15px;
+
+    letter-spacing: .5px;
+}
+
+.summary-value {
+
+    font-size: 24px;
+
+    font-weight: bold;
+
+    margin-top: 7px;
+}
+
+
+/* =====================================================
+   NETWORK CONTROLS
+===================================================== */
+
+.controls {
+
+    display: grid;
+
+    grid-template-columns:
+    repeat(2, 1fr);
+
+    gap: 25px;
+
+    margin-top: 25px;
+}
+
+.control {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+
+    background: #0c1319;
+
+    padding: 12px;
+
+    border-radius: 12px;
+}
+
+.control label {
+
+    flex: 1;
+
+    font-size: 17px;
+}
+
+.control input[type="range"] {
+
+    width: 170px;
+}
+
+.control-value {
+
+    width: 75px;
+
+    text-align: center;
+
+    background: #171a1e;
+
+    padding: 12px;
+
+    border-radius: 18px;
+
+    font-size: 18px;
+}
+
+
+/* =====================================================
+   COMMUNICATION CHARACTERISTICS
+===================================================== */
+
+.comm-grid {
+
+    display: grid;
+
+    grid-template-columns:
+    repeat(4, 1fr);
+
+    gap: 14px;
+
+    margin-top: 25px;
+}
+
+.comm-card {
+
+    background: #102d40;
+
+    border: 1px solid #1b4054;
+
+    border-radius: 11px;
+
+    padding: 18px;
+}
+
+.comm-card span {
+
+    color: #8da5b5;
+
+    display: block;
+
+    font-size: 14px;
+}
+
+.comm-card strong {
+
+    display: block;
+
+    margin-top: 9px;
+
+    font-size: 23px;
+}
+
+.good {
+
+    color: #52eb94;
+}
+
+.warning {
+
+    color: #ffd166;
+}
+
+
+/* =====================================================
+   SIGNAL BARS
+===================================================== */
+
+.signal-bars {
+
+    display: flex;
+
+    align-items: end;
+
+    gap: 4px;
+
+    height: 27px;
+
+    margin-top: 10px;
+}
+
+.signal-bars span {
+
+    width: 7px;
+
+    background: #52eb94;
+
+    border-radius: 2px;
+}
+
+.signal-bars span:nth-child(1) {
+    height: 7px;
+}
+
+.signal-bars span:nth-child(2) {
+    height: 12px;
+}
+
+.signal-bars span:nth-child(3) {
+    height: 17px;
+}
+
+.signal-bars span:nth-child(4) {
+    height: 22px;
+}
+
+.signal-bars span:nth-child(5) {
+    height: 27px;
+}
+
+
+/* =====================================================
+   SENSOR STATUS
+===================================================== */
+
+.sensor-status {
+
+    display: grid;
+
+    grid-template-columns:
+    repeat(4, 1fr);
+
+    gap: 12px;
+}
+
+.sensor {
+
+    background: #102d40;
+
+    padding: 15px;
+
+    border-radius: 9px;
+}
+
+.sensor span {
+
+    float: right;
+
+    color: #52eb94;
+}
+
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+}
+
+th,
+td {
+
+    padding: 13px;
+
+    text-align: left;
+
+    border-bottom:
+    1px solid #1b3a4d;
+}
+
+th {
+
+    color: #8da5b5;
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+footer {
+
+    text-align: center;
+
+    color: #718798;
+
+    padding: 35px;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media(max-width:1000px) {
+
+    .cards,
+    .comm-grid,
+    .sensor-status {
+
+        grid-template-columns:
+        repeat(2, 1fr);
+    }
+
+    .power {
+
+        grid-template-columns:
+        repeat(2, 1fr);
+    }
+
+    .gps {
+
+        grid-template-columns:
+        repeat(2, 1fr);
+    }
+
+    .controls {
+
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media(max-width:600px) {
+
+    .cards,
+    .comm-grid,
+    .sensor-status,
+    .power,
+    .gps {
+
+        grid-template-columns: 1fr;
+    }
+
+    .gyro {
+
+        grid-template-columns: 1fr;
+    }
+
+    .network-map {
+
+        height: 350px;
+    }
+
+    header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+    }
+
+    .control {
+
+        flex-wrap: wrap;
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<!-- ==================================================
+     HEADER
+================================================== -->
+
+<header>
+
+<div class="title">
+
+<h1>🌊 OCEANEYE</h1>
+
+<p>
+Autonomous Low-Cost Ocean Observation Platform
+</p>
+
+<div class="location">
+
+📍 Simulated Deployment:
+Southern Ocean — 65°S, 90°E
+
+</div>
+
+</div>
+
+
+<div class="network-online">
+
+<span class="green-dot"></span>
+
+NETWORK ONLINE
+
+</div>
+
+</header>
+
+
+<!-- ==================================================
+     OCEAN PARAMETERS
+================================================== -->
+
+<h2 class="section-title">
+🌊 Ocean Parameters
+</h2>
+
+
+<div class="cards">
+
+
+<div class="card">
+
+<h3>🧪 pH</h3>
+
+<div class="value" id="ph">
+8.10
+</div>
+
+<div class="range">
+Range: 0 – 14
+</div>
+
+<div class="status normal">
+NORMAL
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>🌡️ Temperature</h3>
+
+<div class="value" id="temperature">
+8.4 °C
+</div>
+
+<div class="range">
+Range: −5 – 40 °C
+</div>
+
+<div class="status normal">
+NORMAL
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>🧂 Salinity</h3>
+
+<div class="value" id="salinity">
+34.6 PSU
+</div>
+
+<div class="range">
+Range: 0 – 40 PSU
+</div>
+
+<div class="status normal">
+NORMAL
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>💧 Dissolved Oxygen</h3>
+
+<div class="value" id="oxygen">
+7.8 mg/L
+</div>
+
+<div class="range">
+Range: 0 – 15 mg/L
+</div>
+
+<div class="status normal">
+GOOD
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ==================================================
+     WAVE
+================================================== -->
+
+<h2 class="section-title">
+🌊 Wave & Motion Monitoring
+</h2>
+
+
+<div class="cards">
+
+
+<div class="card">
+
+<h3>🌊 Wave Height</h3>
+
+<div class="value" id="waveHeight">
+2.4 m
+</div>
+
+<div class="range">
+Range: 0 – 20 m
+</div>
+
+<div class="status normal">
+NORMAL
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>↕️ Wave Motion</h3>
+
+<div class="value" id="waveMotion">
+1.20 m/s²
+</div>
+
+<div class="range">
+Range: 0 – 5 m/s²
+</div>
+
+<div class="status normal">
+STABLE
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>🔄 Buoy Rotation</h3>
+
+<div class="value" id="rotation">
+12.4 °/s
+</div>
+
+<div class="range">
+Gyroscope measurement
+</div>
+
+<div class="status normal">
+STABLE
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>🔋 Battery</h3>
+
+<div class="value" id="battery">
+78%
+</div>
+
+<div class="range">
+Range: 0 – 100%
+</div>
+
+<div class="status normal">
+HEALTHY
+</div>
+
+</div>
+
+
+</div>
+
+
+<!-- ==================================================
+     GYROSCOPE
+================================================== -->
+
+<h2 class="section-title">
+🔄 Gyroscope Monitoring
+</h2>
+
+
+<div class="panel">
+
+
+<div class="gyro">
+
+
+<div class="axis">
+
+X Axis
+
+<strong id="gyroX">
++12.4 °/s
+</strong>
+
+</div>
+
+
+<div class="axis">
+
+Y Axis
+
+<strong id="gyroY">
+−8.7 °/s
+</strong>
+
+</div>
+
+
+<div class="axis">
+
+Z Axis
+
+<strong id="gyroZ">
++21.3 °/s
+</strong>
+
+</div>
+
+
+</div>
+
+
+<p>
+Measurement Range:
+−250 to +250 °/s
+</p>
+
+
+<div class="status normal">
+🟢 STABLE
+</div>
+
+
+</div>
+
+
+<!-- ==================================================
+     DYNAMIC POWER
+================================================== -->
+
+<h2 class="section-title">
+⚡ Dynamic Power Management
+</h2>
+
+
+<div class="power">
+
+
+<div class="power-item">
+
+<span>🔋 Battery</span>
+
+<strong id="powerBattery">
+78%
+</strong>
+
+</div>
+
+
+<div class="power-item">
+
+<span>☀️ Solar Energy</span>
+
+<strong id="solarEnergy">
+4.5 W
+</strong>
+
+</div>
+
+
+<div class="power-item">
+
+<span>🌊 Wave Energy</span>
+
+<strong id="waveEnergy">
+1.4 W
+</strong>
+
+</div>
+
+
+<div class="power-item">
+
+<span>⚡ System Load</span>
+
+<strong id="systemLoad">
+2.0 W
+</strong>
+
+</div>
+
+
+<div class="power-item">
+
+<span>Operating Mode</span>
+
+<strong id="powerMode">
+HIGH
+</strong>
+
+</div>
+
+
+</div>
+
+
+<!-- ==================================================
+     GPS
+================================================== -->
+
+<h2 class="section-title">
+🛰️ GPS Location
+</h2>
+
+
+<div class="panel">
+
+
+<div class="gps">
+
+
+<div class="gps-item">
+
+<span>Latitude</span>
+
+<strong id="latitude">
+65.0000° S
+</strong>
+
+</div>
+
+
+<div class="gps-item">
+
+<span>Longitude</span>
+
+<strong id="longitude">
+90.0000° E
+</strong>
+
+</div>
+
+
+<div class="gps-item">
+
+<span>Satellites</span>
+
+<strong id="satellites">
+9
+</strong>
+
+</div>
+
+
+<div class="gps-item">
+
+<span>GPS Status</span>
+
+<strong class="good">
+FIXED
+</strong>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<!-- ==================================================
+     MAP
+================================================== -->
+
+<h2 class="section-title">
+🗺️ Live OCEANEYE Location
+</h2>
+
+
+<div class="panel">
+
+<p style="color:#8fa9bb">
+
+Simulated Southern Ocean deployment
+
+</p>
+
+<div id="map"></div>
+
+</div>
+
+
+<!-- ==================================================
+     COMMUNICATION MODEL
+================================================== -->
+
+<h2 class="section-title">
+📡 Communication Network Monitoring
+</h2>
+
+
+<div class="communication-panel">
+
+
+<!-- NETWORK TOPOLOGY -->
+
+<div class="network-map"
+     id="networkMap">
+
+
+<!-- RANGE CIRCLES -->
+
+<div class="range-circle"
+     style="
+     width:300px;
+     height:300px;
+     left:50%;
+     top:50%;">
+</div>
+
+
+<div class="range-circle"
+     style="
+     width:500px;
+     height:500px;
+     left:50%;
+     top:50%;">
+</div>
+
+
+<div class="range-circle"
+     style="
+     width:700px;
+     height:700px;
+     left:50%;
+     top:50%;">
+</div>
+
+
+<!-- COVERAGE AREAS -->
+
+<div class="coverage"
+     style="
+     width:170px;
+     height:120px;
+     left:7%;
+     top:8%;">
+</div>
+
+
+<div class="coverage"
+     style="
+     width:190px;
+     height:130px;
+     right:8%;
+     top:10%;">
+</div>
+
+
+<div class="coverage"
+     style="
+     width:170px;
+     height:125px;
+     left:25%;
+     bottom:8%;">
+</div>
+
+
+<div class="coverage"
+     style="
+     width:180px;
+     height:130px;
+     right:24%;
+     bottom:5%;">
+</div>
+
+
+<!-- SVG -->
+
+<svg id="networkSvg">
+
+</svg>
+
+
+<!-- BASE STATION -->
+
+<div class="base-station">
+📡
+</div>
+
+
+<div class="base-label">
+Base Station
+</div>
+
+
+</div>
+
+
+<!-- SUMMARY -->
+
+<div class="network-summary">
+
+
+<div class="summary-item">
+
+<div class="summary-title">
+ACTIVE CONNECTIONS
+</div>
+
+<div class="summary-value"
+     id="activeConnections">
+
+35
+
+</div>
+
+</div>
+
+
+<div class="summary-item">
+
+<div class="summary-title">
+NODES REACHED
+</div>
+
+<div class="summary-value"
+     id="nodesReached">
+
+82%
+
+</div>
+
+</div>
+
+
+</div>
+
+
+<!-- CONTROLS -->
+
+<div class="controls">
+
+
+<div class="control">
+
+<label>
+Node Density
+</label>
+
+<input
+type="range"
+id="nodeDensity"
+min="10"
+max="60"
+value="40">
+
+<div class="control-value"
+id="nodeDensityValue">
+
+40
+
+</div>
+
+</div>
+
+
+<div class="control">
+
+<label>
+Obstacle Density
+</label>
+
+<input
+type="range"
+id="obstacleDensity"
+min="0"
+max="30"
+value="10">
+
+<div class="control-value"
+id="obstacleDensityValue">
+
+10
+
+</div>
+
+</div>
+
+
+<div class="control">
+
+<label>
+Transmit Power
+</label>
+
+<input
+type="range"
+id="transmitPower"
+min="5"
+max="100"
+value="45">
+
+<div class="control-value"
+id="transmitPowerValue">
+
+45
+
+</div>
+
+</div>
+
+
+<div class="control">
+
+<label>
+Communication Range
+</label>
+
+<input
+type="range"
+id="communicationRange"
+min="1"
+max="10"
+value="3">
+
+<div class="control-value"
+id="communicationRangeValue">
+
+3 km
+
+</div>
+
+</div>
+
+
+</div>
+
+
+<!-- COMMON NETWORK CHARACTERISTICS -->
+
+<h3 style="
+margin-top:30px;
+color:#d5e1e8;">
+
+Network Characteristics
+
+</h3>
+
+
+<div class="comm-grid">
+
+
+<div class="comm-card">
+
+<span>
+🌐 Network Status
+</span>
+
+<strong
+class="good"
+id="networkStatus">
+
+CONNECTED
+
+</strong>
+
+</div>
+
+
+<div class="comm-card">
+
+<span>
+📡 Connection Type
+</span>
+
+<strong>
+
+LoRa
+
+</strong>
+
+</div>
+
+
+<div class="comm-card">
+
+<span>
+📶 Signal Strength
+</span>
+
+<strong
+class="good"
+id="signalStrength">
+
+GOOD
+
+</strong>
+
+
+<div class="signal-bars">
+
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+
+</div>
+
+</div>
+
+
+<div class="comm-card">
+
+<span>
+⚡ Network Speed
+</span>
+
+<strong id="networkSpeed">
+
+5.5 kbps
+
+</strong>
+
+</div>
+
+
+<div class="comm-card">
+
+<span>
+⏱️ Latency
+</span>
+
+<strong id="latency">
+
+85 ms
+
+</strong>
+
+</div>
+
+
+<div class="comm-card">
+
+<span>
+📦 Packets Sent
+</span>
+
+<strong id="packetsSent">
+
+124
+
+</strong>
+
+</div>
+
+
+<div class="comm-card">
+
+<span>
+📥 Packets Received
+</span>
+
+<strong id="packetsReceived">
+
+122
+
+</strong>
+
+</div>
+
+
+<div class="comm-card">
+
+<span>
+❌ Packet Loss
+</span>
+
+<strong
+class="good"
+id="packetLoss">
+
+1.6%
+
+</strong>
+
+</div>
+
+
+<div class="comm-card">
+
+<span>
+📡 Communication Range
+</span>
+
+<strong id="range">
+
+3.0 km
+
+</strong>
+
+</div>
+
+
+<div class="comm-card">
+
+<span>
+📊 Link Quality
+</span>
+
+<strong
+class="good"
+id="linkQuality">
+
+GOOD
+
+</strong>
+
+</div>
+
+
+<div class="comm-card">
+
+<span>
+🔄 Last Data Update
+</span>
+
+<strong id="lastUpdate">
+
+Just now
+
+</strong>
+
+</div>
+
+
+<div class="comm-card">
+
+<span>
+🕐 Connection Uptime
+</span>
+
+<strong
+class="good"
+id="uptime">
+
+99.2%
+
+</strong>
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+<!-- ==================================================
+     SENSOR STATUS
+================================================== -->
+
+<h2 class="section-title">
+🔌 Sensor & System Status
+</h2>
+
+
+<div class="sensor-status">
+
+
+<div class="sensor">
+🧪 pH Sensor
+<span>ON</span>
+</div>
+
+
+<div class="sensor">
+🌡️ Temperature
+<span>ON</span>
+</div>
+
+
+<div class="sensor">
+🧂 Salinity
+<span>ON</span>
+</div>
+
+
+<div class="sensor">
+💧 Dissolved Oxygen
+<span>ON</span>
+</div>
+
+
+<div class="sensor">
+🌊 Wave Sensor
+<span>ON</span>
+</div>
+
+
+<div class="sensor">
+🔄 Gyroscope
+<span>ON</span>
+</div>
+
+
+<div class="sensor">
+🛰️ GPS
+<span>FIXED</span>
+</div>
+
+
+<div class="sensor">
+📡 Communication
+<span>ONLINE</span>
+</div>
+
+
+<div class="sensor">
+🔋 Power Monitor
+<span>ON</span>
+</div>
+
+
+<div class="sensor">
+💾 Data Storage
+<span>READY</span>
+</div>
+
+
+</div>
+
+
+<!-- ==================================================
+     EVENT HISTORY
+================================================== -->
+
+<h2 class="section-title">
+📋 Communication Event History
+</h2>
+
+
+<div class="panel">
+
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Time</th>
+
+<th>Event</th>
+
+<th>Value</th>
+
+<th>Location</th>
+
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+
+<tbody id="events">
+
+<tr>
+
+<td>System</td>
+
+<td>OCEANEYE Startup</td>
+
+<td>Network Connected</td>
+
+<td>65°S, 90°E</td>
+
+<td class="good">
+ONLINE
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+
+<footer>
+
+🌊 OCEANEYE © 2026
+
+<br>
+
+Autonomous Ocean Observation
+•
+Dynamic Power
+•
+Network Communication
+•
+LoRa
+
+</footer>
+
+
+</div>
+
+
+<!-- ==================================================
+     LEAFLET
+================================================== -->
+
+<script src=
+"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+
+<script>
+
+/* =====================================================
+   SENSOR VARIABLES
+===================================================== */
+
+let pH = 8.10;
+
+let temperature = 8.4;
+
+let salinity = 34.6;
+
+let oxygen = 7.8;
+
+let waveHeight = 2.4;
+
+let waveMotion = 1.2;
+
+let gyroX = 12.4;
+
+let gyroY = -8.7;
+
+let gyroZ = 21.3;
+
+let battery = 78;
+
+
+/* =====================================================
+   GPS
+===================================================== */
+
+let latitude = -65.0000;
+
+let longitude = 90.0000;
+
+
+/* =====================================================
+   NETWORK
+===================================================== */
+
+let packetsSent = 124;
+
+let packetsReceived = 122;
+
+let uptime = 99.2;
+
+
+/* =====================================================
+   MAP
+===================================================== */
+
+const map =
+
+L.map("map")
+
+.setView(
+
+[
+latitude,
+longitude
+],
+
+4
+
+);
+
+
+L.tileLayer(
+
+"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+
+{
+
+maxZoom: 19,
+
+attribution:
+"© OpenStreetMap contributors"
+
+}
+
+).addTo(map);
+
+
+/* =====================================================
+   BUOY MARKER
+===================================================== */
+
+const buoyIcon =
+
+L.divIcon({
+
+className: "",
+
+html:
+'<div style="font-size:30px">🌊</div>',
+
+iconSize:
+[35,35],
+
+iconAnchor:
+[17,17]
+
+});
+
+
+const marker =
+
+L.marker(
+
+[
+latitude,
+longitude
+],
+
+{
+
+icon: buoyIcon
+
+}
+
+).addTo(map);
+
+
+marker.bindPopup(
+
+"<b>🌊 OCEANEYE</b><br>" +
+
+"Southern Ocean<br>" +
+
+"65°S, 90°E<br><br>" +
+
+"Network: CONNECTED<br>" +
+
+"LoRa: ONLINE"
+
+);
+
+
+/* =====================================================
+   NETWORK NODES
+===================================================== */
+
+const networkMap =
+document.getElementById(
+"networkMap"
+);
+
+const svg =
+document.getElementById(
+"networkSvg"
+);
+
+
+let nodes = [];
+
+
+/* =====================================================
+   CREATE NETWORK
+===================================================== */
+
+function createNetwork() {
+
+
+    document
+    .querySelectorAll(".network-node")
+    .forEach(
+
+        n => n.remove()
+
+    );
+
+
+    nodes = [];
+
+
+    const density =
+
+        Number(
+
+            document
+            .getElementById(
+                "nodeDensity"
+            )
+            .value
+
+        );
+
+
+    for (
+        let i = 0;
+        i < density;
+        i++
+    ) {
+
+
+        const node =
+        document.createElement(
+            "div"
+        );
+
+
+        node.className =
+        "node network-node";
+
+
+        /* random position */
+
+        const x =
+        5 +
+        Math.random() * 90;
+
+
+        const y =
+        5 +
+        Math.random() * 88;
+
+
+        node.style.left =
+        x + "%";
+
+
+        node.style.top =
+        y + "%";
+
+
+        /* some active nodes */
+
+        if (
+            Math.random() > 0.45
+        ) {
+
+            node.classList.add(
+                "active"
+            );
+
+        }
+
+
+        networkMap.appendChild(
+            node
+        );
+
+
+        nodes.push({
+
+            element: node,
+
+            x: x,
+
+            y: y
+
+        });
+
+    }
+
+
+    drawConnections();
+
+}
+
+
+/* =====================================================
+   DRAW NETWORK CONNECTIONS
+===================================================== */
+
+function drawConnections() {
+
+
+    svg.innerHTML = "";
+
+
+    const width =
+    networkMap.clientWidth;
+
+
+    const height =
+    networkMap.clientHeight;
+
+
+    const centerX =
+    width / 2;
+
+
+    const centerY =
+    height / 2;
+
+
+    nodes.forEach(
+
+        node => {
+
+
+            const x =
+            width *
+            node.x /
+            100;
+
+
+            const y =
+            height *
+            node.y /
+            100;
+
+
+            /* Distance from base station */
+
+            const dx =
+            x - centerX;
+
+
+            const dy =
+            y - centerY;
+
+
+            const distance =
+            Math.sqrt(
+                dx * dx +
+                dy * dy
+            );
+
+
+            /* Connect nearby nodes */
+
+            if (
+                distance <
+                280
+            ) {
+
+
+                const line =
+                document.createElementNS(
+
+                    "http://www.w3.org/2000/svg",
+
+                    "line"
+
+                );
+
+
+                line.setAttribute(
+                    "x1",
+                    centerX
+                );
+
+
+                line.setAttribute(
+                    "y1",
+                    centerY
+                );
+
+
+                line.setAttribute(
+                    "x2",
+                    x
+                );
+
+
+                line.setAttribute(
+                    "y2",
+                    y
+                );
+
+
+                line.setAttribute(
+                    "stroke",
+                    "#4c8cff"
+                );
+
+
+                line.setAttribute(
+                    "stroke-width",
+                    "2"
+                );
+
+
+                line.setAttribute(
+                    "opacity",
+                    ".65"
+                );
+
+
+                svg.appendChild(
+                    line
+                );
+
+            }
+
+        }
+
+    );
+
+
+    /* node-to-node links */
+
+    for (
+        let i = 0;
+        i < nodes.length;
+        i++
+    ) {
+
+
+        for (
+            let j = i + 1;
+            j < nodes.length;
+            j++
+        ) {
+
+
+            const a =
+            nodes[i];
+
+
+            const b =
+            nodes[j];
+
+
+            const ax =
+            width *
+            a.x /
+            100;
+
+
+            const ay =
+            height *
+            a.y /
+            100;
+
+
+            const bx =
+            width *
+            b.x /
+            100;
+
+
+            const by =
+            height *
+            b.y /
+            100;
+
+
+            const distance =
+
+            Math.sqrt(
+
+                Math.pow(
+                    ax - bx,
+                    2
+                )
+
+                +
+
+                Math.pow(
+                    ay - by,
+                    2
+                )
+
+            );
+
+
+            if (
+                distance < 115 &&
+                Math.random() > .55
+            ) {
+
+
+                const line =
+                document.createElementNS(
+
+                    "http://www.w3.org/2000/svg",
+
+                    "line"
+
+                );
+
+
+                line.setAttribute(
+                    "x1",
+                    ax
+                );
+
+
+                line.setAttribute(
+                    "y1",
+                    ay
+                );
+
+
+                line.setAttribute(
+                    "x2",
+                    bx
+                );
+
+
+                line.setAttribute(
+                    "y2",
+                    by
+                );
+
+
+                line.setAttribute(
+                    "stroke",
+                    "#3675df"
+                );
+
+
+                line.setAttribute(
+                    "stroke-width",
+                    "1.5"
+                );
+
+
+                line.setAttribute(
+                    "opacity",
+                    ".55"
+                );
+
+
+                svg.appendChild(
+                    line
+                );
+
+            }
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   NETWORK CONTROL
+===================================================== */
+
+document
+.getElementById(
+"nodeDensity"
+)
+.addEventListener(
+
+"input",
+
+function() {
+
+    document
+    .getElementById(
+        "nodeDensityValue"
+    )
+    .textContent =
+    this.value;
+
+    createNetwork();
+
+});
+
+
+document
+.getElementById(
+"obstacleDensity"
+)
+.addEventListener(
+
+"input",
+
+function() {
+
+    document
+    .getElementById(
+        "obstacleDensityValue"
+    )
+    .textContent =
+    this.value;
+
+});
+
+
+document
+.getElementById(
+"transmitPower"
+)
+.addEventListener(
+
+"input",
+
+function() {
+
+    document
+    .getElementById(
+        "transmitPowerValue"
+    )
+    .textContent =
+    this.value;
+
+    drawConnections();
+
+});
+
+
+document
+.getElementById(
+"communicationRange"
+)
+.addEventListener(
+
+"input",
+
+function() {
+
+    document
+    .getElementById(
+        "communicationRangeValue"
+    )
+    .textContent =
+    this.value + " km";
+
+});
+
+
+/* =====================================================
+   SENSOR UPDATE
+===================================================== */
+
+function updateSensors() {
+
+
+    pH +=
+    (Math.random() - .5)
+    * .03;
+
+
+    temperature +=
+    (Math.random() - .5)
+    * .15;
+
+
+    salinity +=
+    (Math.random() - .5)
+    * .12;
+
+
+    oxygen +=
+    (Math.random() - .5)
+    * .12;
+
+
+    waveHeight +=
+    (Math.random() - .5)
+    * .20;
+
+
+    waveMotion +=
+    (Math.random() - .5)
+    * .12;
+
+
+    gyroX +=
+    (Math.random() - .5)
+    * 4;
+
+
+    gyroY +=
+    (Math.random() - .5)
+    * 4;
+
+
+    gyroZ +=
+    (Math.random() - .5)
+    * 4;
+
+
+    /* battery */
+
+    battery +=
+    (Math.random() - .5)
+    * .5;
+
+
+    battery =
+    Math.max(
+        10,
+        Math.min(
+            100,
+            battery
+        )
+    );
+
+
+    /* GPS */
+
+    latitude +=
+    (Math.random() - .5)
+    * .001;
+
+
+    longitude +=
+    (Math.random() - .5)
+    * .001;
+
+
+    /* packets */
+
+    packetsSent++;
+
+
+    if (
+        Math.random() > .04
+    ) {
+
+        packetsReceived++;
+
+    }
+
+}
+
+
+/* =====================================================
+   DASHBOARD UPDATE
+===================================================== */
+
+function updateDashboard() {
+
+
+    updateSensors();
+
+
+    /* Ocean */
+
+    document
+    .getElementById("ph")
+    .textContent =
+    pH.toFixed(2);
+
+
+    document
+    .getElementById("temperature")
+    .textContent =
+    temperature.toFixed(1)
+    + " °C";
+
+
+    document
+    .getElementById("salinity")
+    .textContent =
+    salinity.toFixed(1)
+    + " PSU";
+
+
+    document
+    .getElementById("oxygen")
+    .textContent =
+    oxygen.toFixed(1)
+    + " mg/L";
+
+
+    /* Wave */
+
+    document
+    .getElementById("waveHeight")
+    .textContent =
+    waveHeight.toFixed(1)
+    + " m";
+
+
+    document
+    .getElementById("waveMotion")
+    .textContent =
+    waveMotion.toFixed(2)
+    + " m/s²";
+
+
+    document
+    .getElementById("rotation")
+    .textContent =
+    Math.abs(gyroZ)
+    .toFixed(1)
+    + " °/s";
+
+
+    /* Gyroscope */
+
+    document
+    .getElementById("gyroX")
+    .textContent =
+    signed(gyroX)
+    + " °/s";
+
+
+    document
+    .getElementById("gyroY")
+    .textContent =
+    signed(gyroY)
+    + " °/s";
+
+
+    document
+    .getElementById("gyroZ")
+    .textContent =
+    signed(gyroZ)
+    + " °/s";
+
+
+    /* Battery */
+
+    document
+    .getElementById("battery")
+    .textContent =
+    battery.toFixed(0)
+    + "%";
+
+
+    document
+    .getElementById("powerBattery")
+    .textContent =
+    battery.toFixed(0)
+    + "%";
+
+
+    /* Power */
+
+    let waveEnergy =
+
+    Math.max(
+        .1,
+        waveMotion * 1.1
+    );
+
+
+    document
+    .getElementById("waveEnergy")
+    .textContent =
+    waveEnergy.toFixed(1)
+    + " W";
+
+
+    let mode;
+
+
+    if (
+        battery < 20
+    ) {
+
+        mode =
+        "CRITICAL";
+
+    }
+
+    else if (
+        battery < 40
+    ) {
+
+        mode =
+        "LOW POWER";
+
+    }
+
+    else if (
+        battery < 70
+    ) {
+
+        mode =
+        "NORMAL";
+
+    }
+
+    else {
+
+        mode =
+        "HIGH";
+
+    }
+
+
+    document
+    .getElementById("powerMode")
+    .textContent =
+    mode;
+
+
+    /* GPS */
+
+    document
+    .getElementById("latitude")
+    .textContent =
+
+    Math.abs(latitude)
+    .toFixed(4)
+
+    +
+
+    (
+        latitude < 0
+        ? "° S"
+        : "° N"
+    );
+
+
+    document
+    .getElementById("longitude")
+    .textContent =
+
+    Math.abs(longitude)
+    .toFixed(4)
+
+    +
+
+    (
+        longitude < 0
+        ? "° W"
+        : "° E"
+    );
+
+
+    marker.setLatLng(
+    [
+        latitude,
+        longitude
+    ]
+    );
+
+
+    /* =================================================
+       NETWORK
+    ================================================= */
+
+
+    let density =
+
+    Number(
+
+        document
+        .getElementById(
+            "nodeDensity"
+        )
+        .value
+
+    );
+
+
+    let active =
+
+    Math.round(
+        density *
+        (.65 + Math.random()*.25)
+    );
+
+
+    let reached =
+
+    Math.min(
+        100,
+        Math.round(
+            60 +
+            density * .5
+        )
+    );
+
+
+    document
+    .getElementById(
+        "activeConnections"
+    )
+    .textContent =
+    active;
+
+
+    document
+    .getElementById(
+        "nodesReached"
+    )
+    .textContent =
+    reached + "%";
+
+
+    /* Signal */
+
+    let rssi =
+
+    -65 -
+    Math.random()*25;
+
+
+    let signal;
+
+
+    if (
+        rssi > -70
+    ) {
+
+        signal =
+        "EXCELLENT";
+
+    }
+
+    else if (
+        rssi > -85
+    ) {
+
+        signal =
+        "GOOD";
+
+    }
+
+    else {
+
+        signal =
+        "WEAK";
+
+    }
+
+
+    document
+    .getElementById(
+        "signalStrength"
+    )
+    .textContent =
+    signal;
+
+
+    /* Network speed */
+
+    let speed =
+
+    4 +
+    Math.random()*3;
+
+
+    document
+    .getElementById(
+        "networkSpeed"
+    )
+    .textContent =
+
+    speed.toFixed(1)
+    + " kbps";
+
+
+    /* Latency */
+
+    let latency =
+
+    60 +
+    Math.random()*70;
+
+
+    document
+    .getElementById(
+        "latency"
+    )
+    .textContent =
+
+    latency.toFixed(0)
+    + " ms";
+
+
+    /* packets */
+
+    document
+    .getElementById(
+        "packetsSent"
+    )
+    .textContent =
+    packetsSent;
+
+
+    document
+    .getElementById(
+        "packetsReceived"
+    )
+    .textContent =
+    packetsReceived;
+
+
+    /* packet loss */
+
+    let loss =
+
+    Math.max(
+
+        0,
+
+        (
+            1 -
+            packetsReceived /
+            packetsSent
+        )
+        * 100
+
+    );
+
+
+    document
+    .getElementById(
+        "packetLoss"
+    )
+    .textContent =
+
+    loss.toFixed(1)
+    + "%";
+
+
+    /* Range */
+
+    let range =
+
+    document
+    .getElementById(
+        "communicationRange"
+    )
+    .value;
+
+
+    document
+    .getElementById(
+        "range"
+    )
+    .textContent =
+    range + " km";
+
+
+    /* Link quality */
+
+    let quality;
+
+
+    if (
+        loss < 3
+    ) {
+
+        quality =
+        "EXCELLENT";
+
+    }
+
+    else if (
+        loss < 7
+    ) {
+
+        quality =
+        "GOOD";
+
+    }
+
+    else {
+
+        quality =
+        "POOR";
+
+    }
+
+
+    document
+    .getElementById(
+        "linkQuality"
+    )
+    .textContent =
+    quality;
+
+
+    /* Uptime */
+
+    uptime +=
+    (Math.random() - .5)
+    * .02;
+
+
+    uptime =
+    Math.max(
+        95,
+        Math.min(
+            100,
+            uptime
+        )
+    );
+
+
+    document
+    .getElementById(
+        "uptime"
+    )
+    .textContent =
+
+    uptime.toFixed(1)
+    + "%";
+
+
+    document
+    .getElementById(
+        "lastUpdate"
+    )
+    .textContent =
+    "Just now";
+
+
+    /* Network graph */
+
+    drawConnections();
+
+}
+
+
+/* =====================================================
+   SIGNED NUMBER
+===================================================== */
+
+function signed(value) {
+
+    if (
+        value >= 0
+    ) {
+
+        return "+" +
+        value.toFixed(1);
+
+    }
+
+    return value.toFixed(1);
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+createNetwork();
+
+updateDashboard();
+
+
+setInterval(
+
+    updateDashboard,
+
+    2000
+
+);
+
+
+window.addEventListener(
+
+    "resize",
+
+    drawConnections
+
+);
+
+</script>
+
+
+</body>
+
+</html>
